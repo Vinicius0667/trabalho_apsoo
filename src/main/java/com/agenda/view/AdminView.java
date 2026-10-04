@@ -6,17 +6,18 @@ import com.agenda.model.Administrador;
 import javax.swing.*;
 import java.awt.*;
 
-public class AdminView extends TelaComVoltar {
+public class AdminView extends JFrame {
     private final AdminControladora controller;
 
-    public AdminView(JFrame telaAnterior) {
-        super("Agenda - Área do administrador", telaAnterior);
+    public AdminView() {
+        super("Agenda - Área do administrador");
         controller = new AdminControladora();
         inicializarComponentes();
     }
 
     private void inicializarComponentes() {
         setSize(450, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(5, 5));
 
@@ -43,7 +44,9 @@ public class AdminView extends TelaComVoltar {
         add(perfil, BorderLayout.CENTER);
 
         JPanel botoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        botoes.add(criarBotaoVoltar());
+        JButton btnVoltar = new JButton("Voltar");
+        btnVoltar.addActionListener(e -> dispose());
+        botoes.add(btnVoltar);
         add(botoes, BorderLayout.SOUTH);
     }
 

@@ -21,6 +21,7 @@ public class AgendamentosView extends JFrame {
     public AgendamentosView() {
         controller = new AgendamentoControladora();
         inicializarComponentes();
+        atualizarTabela();
     }
 
     private void inicializarComponentes() {
@@ -36,13 +37,9 @@ public class AgendamentosView extends JFrame {
         add(titulo, BorderLayout.NORTH);
 
         modeloTabela = new DefaultTableModel(
-                new String[]{"ID", "Cliente", "Profissional", "Data", "Início", "Fim", "Serviços", "Valor", "Status"}, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+                new String[]{"ID", "Cliente", "Profissional", "Data", "Início", "Fim", "Serviços", "Valor", "Status"}, 0);
         JTable tabela = new JTable(modeloTabela);
+        tabela.setDefaultEditor(Object.class, null);
         tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabela.getColumnModel().getColumn(0).setMaxWidth(50);
         tabela.getColumnModel().getColumn(6).setPreferredWidth(200);
@@ -62,25 +59,12 @@ public class AgendamentosView extends JFrame {
         rodape.add(direita, BorderLayout.EAST);
         add(rodape, BorderLayout.SOUTH);
 
-        btnAdmin.addActionListener(e -> abrir(new AdminView(this)));
+        btnAdmin.addActionListener(e -> new AdminView().setVisible(true));
         btnAtualizar.addActionListener(e -> atualizarTabela());
-        btnNovo.addActionListener(e -> abrir(new CadastroAgendamentoView(this)));
+        btnNovo.addActionListener(e -> new ProfissionalView(this).setVisible(true));
     }
 
-    @Override
-    public void setVisible(boolean visivel) {
-        if (visivel) {
-            atualizarTabela();
-        }
-        super.setVisible(visivel);
-    }
-
-    private void abrir(JFrame tela) {
-        setVisible(false);
-        tela.setVisible(true);
-    }
-
-    private void atualizarTabela() {
+    public void atualizarTabela() {
         modeloTabela.setRowCount(0);
         try {
             for (Agendamento a : controller.listarTodosAgendamentos()) {
