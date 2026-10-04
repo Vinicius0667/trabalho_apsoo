@@ -26,6 +26,22 @@ public class Agendamento {
         this.status = StatusAgendamento.AGENDADO;
     }
 
+    public Agendamento(Cliente cliente, 
+        Profissional profissional,
+        LocalDate dataAgendada,
+        LocalTime horarioInicio,
+        String observacoes,
+        ItemAgendamento item) 
+    {
+        this.status = StatusAgendamento.AGENDADO;
+        this.cliente = cliente;
+        this.profissional = profissional;
+        this.dataAgendada = dataAgendada;
+        this.horarioInicio = horarioInicio;
+        this.observacoes = observacoes;
+        this.itens.add(item);
+    }
+
     public void adicionarItem(ItemAgendamento item) {
         itens.add(item);
     }

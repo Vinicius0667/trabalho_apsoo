@@ -134,13 +134,13 @@ public class AgendamentoControladora {
                     + "(atualmente tem " + obs.length() + ").");
         }
 
-        Agendamento agendamento = new Agendamento();
-        agendamento.setCliente(cliente);
-        agendamento.setProfissional(profissional);
-        agendamento.setDataAgendada(data);
-        agendamento.setHorarioInicio(horarioInicio);
-        agendamento.setObservacoes(obs.isEmpty() ? null : obs);
-        agendamento.adicionarItem(new ItemAgendamento(servico));
+        Agendamento agendamento = new Agendamento(cliente, 
+            profissional, 
+            data, 
+            horarioInicio, 
+            obs.isEmpty() ? null : obs, 
+            new ItemAgendamento(servico));
+            
         agendamento.setHorarioFim(horarioInicio.plusMinutes(agendamento.getDuracaoTotal()));
 
         try {
