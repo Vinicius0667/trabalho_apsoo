@@ -1,15 +1,16 @@
 package com.agenda.controller;
 
 import com.agenda.dao.AgendamentoDAO;
+import com.agenda.dao.ClienteDAO;
 import com.agenda.dao.ServicoDAO;
 import com.agenda.dao.UsuarioDAO;
+import com.agenda.exception.ClienteNaoSelecionadoException;
 import com.agenda.exception.DadoInvalidoException;
 import com.agenda.exception.DataInvalidaException;
 import com.agenda.exception.DataPassadaException;
 import com.agenda.exception.HorarioIndisponivelException;
 import com.agenda.exception.HorarioInvalidoException;
 import com.agenda.exception.HorarioPassadoException;
-import com.agenda.exception.NomeClienteInvalidoException;
 import com.agenda.exception.ObservacaoInvalidaException;
 import com.agenda.exception.ProfissionalNaoSelecionadoException;
 import com.agenda.exception.ServicoNaoSelecionadoException;
@@ -25,27 +26,29 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.ArrayList;
 import java.util.List;
 
-/** Regras da tela inicial (lista de agendamentos) e do cadastro de agendamento. */
 public class AgendamentoControladora {
-
-    // STRICT faz datas inexistentes como 31/02 serem rejeitadas em vez de "ajustadas"
     private static final DateTimeFormatter FORMATO_DATA =
             DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
-    private static final DateTimeFormatter FORMATO_HORA =
-            DateTimeFormatter.ofPattern("HH:mm").withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    // Tamanhos das colunas no init.sql
-    private static final int TAMANHO_MAXIMO_NOME = 60;
+    private static final List<LocalTime> HORARIOS_ATENDIMENTO = List.of(
+            LocalTime.of(8, 0), LocalTime.of(9, 0), LocalTime.of(10, 0), LocalTime.of(11, 0),
+            LocalTime.of(13, 0), LocalTime.of(14, 0), LocalTime.of(15, 0), LocalTime.of(16, 0),
+            LocalTime.of(17, 0));
+
     private static final int TAMANHO_MAXIMO_OBSERVACAO = 255;
 
     private final AgendamentoDAO agendamentoDAO;
+    private final ClienteDAO clienteDAO;
     private final ServicoDAO servicoDAO;
     private final UsuarioDAO usuarioDAO;
 
     public AgendamentoControladora() {
         this.agendamentoDAO = new AgendamentoDAO();
+        this.clienteDAO = new ClienteDAO();
         this.servicoDAO = new ServicoDAO();
         this.usuarioDAO = new UsuarioDAO();
     }
@@ -55,6 +58,14 @@ public class AgendamentoControladora {
             return agendamentoDAO.listar();
         } catch (SQLException e) {
             throw new Exception("Erro ao listar agendamentos: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Cliente> listarClientes() throws Exception {
+        try {
+            return clienteDAO.listar();
+        } catch (SQLException e) {
+            throw new Exception("Erro ao listar clientes: " + e.getMessage(), e);
         }
     }
 
@@ -74,24 +85,46 @@ public class AgendamentoControladora {
         }
     }
 
-    /**
-     * Valida os dados digitados, cria o cliente e salva o agendamento.
-     * Cada dado incorreto lança a sua própria exceção (subclasses de DadoInvalidoException).
-     */
-    public Agendamento agendar(String nomeCliente, Profissional profissional, String textoData, String textoHora,
-                               List<Servico> servicos, String observacoes) throws DadoInvalidoException, Exception {
-        Cliente cliente = new Cliente();
-        cliente.setNome(validarNomeCliente(nomeCliente));
+    public List<LocalTime> listarHorariosDisponiveis(Profissional profissional, Servico servico, String textoData)
+            throws DadoInvalidoException, Exception {
+        List<LocalTime> disponiveis = new ArrayList<>();
+        if (profissional == null || servico == null) {
+            return disponiveis;
+        }
+        LocalDate data = validarData(textoData);
 
+        try {
+            for (LocalTime inicio : HORARIOS_ATENDIMENTO) {
+                boolean jaPassou = data.isEqual(LocalDate.now()) && inicio.isBefore(LocalTime.now());
+                LocalTime fim = inicio.plusMinutes(servico.getDuracaoMinutos());
+                if (!jaPassou && !agendamentoDAO.existeConflito(profissional.getIdProfissional(), data, inicio, fim)) {
+                    disponiveis.add(inicio);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Erro ao consultar horários: " + e.getMessage(), e);
+        }
+        return disponiveis;
+    }
+
+    public Agendamento agendar(Cliente cliente, Servico servico, Profissional profissional, String textoData,
+                               LocalTime horarioInicio, String observacoes) throws DadoInvalidoException, Exception {
+        if (cliente == null) {
+            throw new ClienteNaoSelecionadoException("Selecione o cliente do agendamento.");
+        }
+        if (servico == null) {
+            throw new ServicoNaoSelecionadoException("Selecione o serviço.");
+        }
         if (profissional == null) {
             throw new ProfissionalNaoSelecionadoException("Selecione o profissional que fará o atendimento.");
         }
 
         LocalDate data = validarData(textoData);
-        LocalTime horarioInicio = validarHorario(textoHora, data);
-
-        if (servicos == null || servicos.isEmpty()) {
-            throw new ServicoNaoSelecionadoException("Selecione pelo menos um serviço.");
+        if (horarioInicio == null) {
+            throw new HorarioInvalidoException("Selecione um dos horários disponíveis.");
+        }
+        if (data.isEqual(LocalDate.now()) && horarioInicio.isBefore(LocalTime.now())) {
+            throw new HorarioPassadoException("Esse horário de hoje já passou. Escolha um horário mais tarde.");
         }
 
         String obs = observacoes == null ? "" : observacoes.trim();
@@ -107,17 +140,7 @@ public class AgendamentoControladora {
         agendamento.setDataAgendada(data);
         agendamento.setHorarioInicio(horarioInicio);
         agendamento.setObservacoes(obs.isEmpty() ? null : obs);
-        for (Servico servico : servicos) {
-            agendamento.adicionarItem(new ItemAgendamento(servico));
-        }
-
-        // Comparando em minutos do dia evita que um horário depois da meia-noite "dê a volta"
-        int fimEmMinutos = horarioInicio.toSecondOfDay() / 60 + agendamento.getDuracaoTotal();
-        if (fimEmMinutos >= 24 * 60) {
-            throw new HorarioInvalidoException(
-                    "Os serviços escolhidos duram " + agendamento.getDuracaoTotal() + " minutos e "
-                    + "terminariam depois da meia-noite. Escolha um horário mais cedo.");
-        }
+        agendamento.adicionarItem(new ItemAgendamento(servico));
         agendamento.setHorarioFim(horarioInicio.plusMinutes(agendamento.getDuracaoTotal()));
 
         try {
@@ -135,25 +158,6 @@ public class AgendamentoControladora {
         return agendamento;
     }
 
-    private String validarNomeCliente(String nome) throws NomeClienteInvalidoException {
-        String valor = nome == null ? "" : nome.trim().replaceAll("\\s+", " ");
-        if (valor.isEmpty()) {
-            throw new NomeClienteInvalidoException("O nome do cliente não pode ficar vazio.");
-        }
-        if (valor.length() < 3) {
-            throw new NomeClienteInvalidoException("O nome do cliente deve ter pelo menos 3 letras.");
-        }
-        if (valor.length() > TAMANHO_MAXIMO_NOME) {
-            throw new NomeClienteInvalidoException(
-                    "O nome do cliente pode ter no máximo " + TAMANHO_MAXIMO_NOME + " caracteres.");
-        }
-        // \p{L} aceita letras com acento (ç, ã, é...)
-        if (!valor.matches("[\\p{L} '-]+")) {
-            throw new NomeClienteInvalidoException("O nome do cliente deve conter apenas letras.");
-        }
-        return valor;
-    }
-
     private LocalDate validarData(String texto) throws DadoInvalidoException {
         LocalDate data;
         try {
@@ -166,19 +170,5 @@ public class AgendamentoControladora {
             throw new DataPassadaException("Não é possível agendar em uma data que já passou.");
         }
         return data;
-    }
-
-    private LocalTime validarHorario(String texto, LocalDate data) throws DadoInvalidoException {
-        LocalTime horario;
-        try {
-            horario = LocalTime.parse(texto == null ? "" : texto.trim(), FORMATO_HORA);
-        } catch (DateTimeParseException e) {
-            throw new HorarioInvalidoException(
-                    "Horário inválido: \"" + texto + "\". Use o formato HH:mm (ex.: 09:30).");
-        }
-        if (data.isEqual(LocalDate.now()) && horario.isBefore(LocalTime.now())) {
-            throw new HorarioPassadoException("Esse horário de hoje já passou. Escolha um horário mais tarde.");
-        }
-        return horario;
     }
 }

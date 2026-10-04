@@ -17,13 +17,9 @@ public class Agendamento {
     private LocalTime horarioInicioRealizacao;
     private LocalTime horarioFimRealizacao;
 
-    // Cliente 1 solicita 0..* Agendamento
     private Cliente cliente;
-    // Profissional que vai atender o agendamento
     private Profissional profissional;
-    // Agendamento 1 <>-- 1..* ItemAgendamento (composicao)
     private List<ItemAgendamento> itens = new ArrayList<>();
-    // Agendamento 1 gera 0..1 RepasseComissao
     private RepasseComissao repasseComissao;
 
     public Agendamento() {

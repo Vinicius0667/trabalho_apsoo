@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemAgendamentoDAO {
-
     private final ServicoDAO servicoDAO = new ServicoDAO();
 
-    // Recebe a conexão para participar da mesma transação do AgendamentoDAO
     public void inserir(Connection conn, long idAgendamento, ItemAgendamento item) throws SQLException {
         String sql = "INSERT INTO item_agendamento (id_agendamento, id_servico, duracao_realizada, valor_cobrado) " +
                      "VALUES (?, ?, ?, ?) RETURNING id";

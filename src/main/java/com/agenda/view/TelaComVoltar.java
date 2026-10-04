@@ -4,12 +4,7 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/**
- * Base das telas que são abertas a partir de outra.
- * Guarda a tela anterior e oferece o botão "Voltar" (fechar no X também volta).
- */
 public abstract class TelaComVoltar extends JFrame {
-
     private final JFrame telaAnterior;
 
     protected TelaComVoltar(String titulo, JFrame telaAnterior) {

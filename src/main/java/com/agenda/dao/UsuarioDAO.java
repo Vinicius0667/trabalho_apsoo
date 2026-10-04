@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsuarioDAO {
-
     private static final String SQL_PROFISSIONAL =
             "SELECT u.id, u.nome, u.cpf, u.telefone, u.email, " +
             "       p.percentual_comissao, p.status_profissional, p.ativo " +
@@ -74,7 +73,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Profissional 1..* possui 1..* Especialidade (tabela profissional_especialidade)
     public List<Especialidade> listarEspecialidades(long idProfissional) throws SQLException {
         String sql = "SELECT e.* FROM especialidade e " +
                      "JOIN profissional_especialidade pe ON pe.id_especialidade = e.id_especialidade " +

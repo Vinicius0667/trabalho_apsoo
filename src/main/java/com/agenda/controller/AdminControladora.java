@@ -9,13 +9,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class AdminControladora {
-
-    // Por enquanto não há login: usa o administrador cadastrado no init.sql
     private static final long ID_ADMIN_PADRAO = 1;
 
     private final AgendamentoDAO agendamentoDAO;
     private final UsuarioDAO usuarioDAO;
-    // O administrador reaproveita as regras de agendamento do profissional
     private final ProfissionalControladora profissionalControladora;
 
     private Administrador administrador;

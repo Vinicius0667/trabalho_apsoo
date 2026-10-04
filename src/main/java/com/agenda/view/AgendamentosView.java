@@ -10,9 +10,7 @@ import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.StringJoiner;
 
-/** Tela inicial: lista todos os agendamentos cadastrados. */
 public class AgendamentosView extends JFrame {
-
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -69,7 +67,6 @@ public class AgendamentosView extends JFrame {
         btnNovo.addActionListener(e -> abrir(new CadastroAgendamentoView(this)));
     }
 
-    /** Recarrega a lista sempre que a tela aparece (inclusive ao voltar do cadastro). */
     @Override
     public void setVisible(boolean visivel) {
         if (visivel) {

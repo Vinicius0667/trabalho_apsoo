@@ -21,7 +21,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class ProfissionalControladora {
-
     private final AgendamentoDAO agendamentoDAO;
     private final ClienteDAO clienteDAO;
     private final ServicoDAO servicoDAO;
@@ -85,7 +84,6 @@ public class ProfissionalControladora {
         }
     }
 
-    /** Marca o agendamento como concluído e gera o repasse de comissão do profissional. */
     public void concluirAgendamento(long idAgendamento) throws Exception {
         Agendamento agendamento = buscarAgendamentoAtivo(idAgendamento);
         try {
@@ -111,7 +109,8 @@ public class ProfissionalControladora {
 
     public List<Agendamento> listarAgendamentos(Profissional profissional) throws Exception {
         try {
-            return agendamentoDAO.listarPorProfissional(profissional.getIdProfissional());
+            profissional.setAgendamentos(agendamentoDAO.listarPorProfissional(profissional.getIdProfissional()));
+            return profissional.getAgendamentos();
         } catch (SQLException e) {
             throw new Exception("Erro ao listar agendamentos: " + e.getMessage(), e);
         }
@@ -136,7 +135,6 @@ public class ProfissionalControladora {
     public List<Profissional> listarProfissionais() throws Exception {
         try {
             List<Profissional> profissionais = usuarioDAO.listarProfissionaisAtivos();
-            // Profissional 1 possui 0..* AgendaProfissional
             for (Profissional p : profissionais) {
                 p.setAgendas(agendaDAO.listarPorProfissional(p.getIdProfissional()));
             }

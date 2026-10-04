@@ -12,24 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteDAO {
-
-    // Recebe a conexão para participar da mesma transação do AgendamentoDAO
-    public void inserir(Connection conn, Cliente cliente) throws SQLException {
-        String sql = "INSERT INTO cliente (nome, observacoes) VALUES (?, ?) RETURNING id, data_cadastro";
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, cliente.getNome());
-            stmt.setString(2, cliente.getObservacoes());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    cliente.setId(rs.getLong("id"));
-                    cliente.setDataCadastro(rs.getObject("data_cadastro", LocalDate.class));
-                }
-            }
-        }
-    }
-
     public List<Cliente> listar() throws SQLException {
         List<Cliente> lista = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance().getConnection();

@@ -9,10 +9,9 @@ public class Profissional extends Usuario {
     private String statusProfissional;
     private boolean ativo;
 
-    // Profissional 1..* possui 1..* Especialidade
     private List<Especialidade> especialidades = new ArrayList<>();
-    // Profissional 1 possui 0..* AgendaProfissional
     private List<AgendaProfissional> agendas = new ArrayList<>();
+    private List<Agendamento> agendamentos = new ArrayList<>();
 
     public Profissional() {
         super();
@@ -64,5 +63,13 @@ public class Profissional extends Usuario {
 
     public void setAgendas(List<AgendaProfissional> agendas) {
         this.agendas = agendas;
+    }
+
+    public List<Agendamento> getAgendamentos() {
+        return agendamentos;
+    }
+
+    public void setAgendamentos(List<Agendamento> agendamentos) {
+        this.agendamentos = agendamentos;
     }
 }

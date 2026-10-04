@@ -6,9 +6,7 @@ import com.agenda.model.Administrador;
 import javax.swing.*;
 import java.awt.*;
 
-/** Área do administrador: por enquanto só mostra o perfil (sem autenticação). */
 public class AdminView extends TelaComVoltar {
-
     private final AdminControladora controller;
 
     public AdminView(JFrame telaAnterior) {

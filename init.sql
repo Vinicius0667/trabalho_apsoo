@@ -1,7 +1,3 @@
--- ======================================================================
--- 1. USUARIO E SUAS ESPECIALIZACOES (Administrador / Profissional)
--- ======================================================================
-
 CREATE TABLE IF NOT EXISTS public.usuario (
     id bigserial NOT NULL,
     nome varchar(60) NOT NULL,
@@ -28,10 +24,6 @@ CREATE TABLE IF NOT EXISTS public.profissional (
     CONSTRAINT profissional_id_fkey FOREIGN KEY (id_profissional) REFERENCES public.usuario(id) ON DELETE CASCADE
 );
 
--- ======================================================================
--- 2. ESPECIALIDADE E AGENDA DO PROFISSIONAL
--- ======================================================================
-
 CREATE TABLE IF NOT EXISTS public.especialidade (
     id_especialidade bigserial NOT NULL,
     nome varchar(50) NOT NULL,
@@ -39,7 +31,6 @@ CREATE TABLE IF NOT EXISTS public.especialidade (
     CONSTRAINT especialidade_pkey PRIMARY KEY (id_especialidade)
 );
 
--- Profissional 1..* <-> 1..* Especialidade
 CREATE TABLE IF NOT EXISTS public.profissional_especialidade (
     id_profissional int8 NOT NULL,
     id_especialidade int8 NOT NULL,
@@ -59,10 +50,6 @@ CREATE TABLE IF NOT EXISTS public.agenda_profissional (
     CONSTRAINT agenda_profissional_fkey FOREIGN KEY (id_profissional) REFERENCES public.profissional(id_profissional) ON DELETE CASCADE
 );
 
--- ======================================================================
--- 3. CLIENTE E SERVICO
--- ======================================================================
-
 CREATE TABLE IF NOT EXISTS public.cliente (
     id bigserial NOT NULL,
     nome varchar(60) NOT NULL,
@@ -80,12 +67,6 @@ CREATE TABLE IF NOT EXISTS public.servico (
     CONSTRAINT servico_pkey PRIMARY KEY (id)
 );
 
--- ======================================================================
--- 4. AGENDAMENTO, ITENS E REPASSE DE COMISSAO
--- ======================================================================
-
--- status segue o enum StatusAgendamento:
--- 1 = AGENDADO, 2 = BLOQUEADO, 3 = CANCELADO, 4 = PENDENTE, 5 = CONCLUIDO
 CREATE TABLE IF NOT EXISTS public.agendamento (
     id bigserial NOT NULL,
     id_cliente int8 NOT NULL,
@@ -104,7 +85,6 @@ CREATE TABLE IF NOT EXISTS public.agendamento (
     CONSTRAINT agendamento_profissional_fkey FOREIGN KEY (id_profissional) REFERENCES public.profissional(id_profissional)
 );
 
--- Composicao: os itens morrem junto com o agendamento
 CREATE TABLE IF NOT EXISTS public.item_agendamento (
     id bigserial NOT NULL,
     id_agendamento int8 NOT NULL,
@@ -116,7 +96,6 @@ CREATE TABLE IF NOT EXISTS public.item_agendamento (
     CONSTRAINT item_agendamento_servico_fkey FOREIGN KEY (id_servico) REFERENCES public.servico(id)
 );
 
--- Agendamento 1 -> 0..1 RepasseComissao
 CREATE TABLE IF NOT EXISTS public.repasse_comissao (
     id_repasse bigserial NOT NULL,
     id_agendamento int8 NOT NULL,
@@ -130,10 +109,6 @@ CREATE TABLE IF NOT EXISTS public.repasse_comissao (
     CONSTRAINT repasse_comissao_agendamento_key UNIQUE (id_agendamento),
     CONSTRAINT repasse_comissao_agendamento_fkey FOREIGN KEY (id_agendamento) REFERENCES public.agendamento(id) ON DELETE CASCADE
 );
-
--- ======================================================================
--- 5. DADOS INICIAIS (para conseguir testar o agendamento)
--- ======================================================================
 
 INSERT INTO public.usuario (id, nome, cpf, telefone, email, senha) VALUES
     (1, 'Admin', '000.000.000-00', '67999990000', 'admin@agenda.com', 'admin'),
@@ -166,7 +141,13 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO public.cliente (id, nome, observacoes) VALUES
     (1, 'Ana Pereira', NULL),
-    (2, 'Carlos Mendes', 'Prefere atendimento pela manha')
+    (2, 'Carlos Mendes', 'Prefere atendimento pela manha'),
+    (3, 'Beatriz Oliveira', NULL),
+    (4, 'Lucas Ferreira', 'Alergico a alguns produtos quimicos'),
+    (5, 'Juliana Costa', NULL),
+    (6, 'Rafael Rodrigues', NULL),
+    (7, 'Camila Martins', 'Prefere atendimento a tarde'),
+    (8, 'Gabriel Almeida', NULL)
 ON CONFLICT DO NOTHING;
 SELECT setval('cliente_id_seq', (SELECT MAX(id) FROM public.cliente));
 

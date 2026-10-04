@@ -5,7 +5,6 @@ public class ItemAgendamento {
     private int duracaoRealizada;
     private float valorCobrado;
 
-    // ItemAgendamento 0..* contem 1 Servico
     private Servico servico;
 
     public ItemAgendamento() {}

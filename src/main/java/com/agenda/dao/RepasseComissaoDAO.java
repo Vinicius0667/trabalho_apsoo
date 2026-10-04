@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class RepasseComissaoDAO {
-
     public void inserir(long idAgendamento, RepasseComissao repasse) throws SQLException {
         String sql = "INSERT INTO repasse_comissao " +
                      "(id_agendamento, valor_pago_cliente, percentual_aplicado, valor_comissao, data_calculo, status_pagamento) " +

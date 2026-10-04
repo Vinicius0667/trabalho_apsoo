@@ -14,7 +14,6 @@ public class App {
             e.printStackTrace();
         }
 
-        // Fecha a conexão única (singleton) quando o programa terminar
         Runtime.getRuntime().addShutdownHook(new Thread(() -> DatabaseConnection.getInstance().fecharConexao()));
 
         SwingUtilities.invokeLater(() -> new AgendamentosView().setVisible(true));

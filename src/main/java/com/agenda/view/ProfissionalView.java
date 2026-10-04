@@ -16,7 +16,6 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class ProfissionalView extends JFrame {
-
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -44,7 +43,6 @@ public class ProfissionalView extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(5, 5));
 
-        // ---------- Formulário de novo agendamento ----------
         JPanel form = new JPanel(new GridBagLayout());
         form.setBorder(BorderFactory.createTitledBorder("Novo agendamento"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -72,7 +70,6 @@ public class ProfissionalView extends JFrame {
 
         add(form, BorderLayout.NORTH);
 
-        // ---------- Tabela de agendamentos do profissional ----------
         modeloTabela = new DefaultTableModel(
                 new String[]{"ID", "Cliente", "Data", "Início", "Fim", "Status"}, 0) {
             @Override

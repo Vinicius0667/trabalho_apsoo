@@ -9,16 +9,12 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      # Cria as tabelas e dados iniciais na primeira vez que o banco sobe
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      # -h força o teste por TCP: durante o init.sql o Postgres só escuta no socket local,
-      # então sem isso o banco ficava "healthy" antes de aceitar conexões do app
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U root -d agenda"]
       interval: 5s
       timeout: 5s
       retries: 10
-      # Falhas durante a primeira inicialização (rodando o init.sql) não contam
       start_period: 60s
     restart: unless-stopped
 
@@ -32,13 +28,11 @@ services:
       - DB_URL=jdbc:postgresql://db:5432/agenda
       - DB_USER=root
       - DB_PASSWORD=root
-      # Sem isso o container usa UTC e "hoje"/"agora" ficam errados nas validações
       - TZ=America/Campo_Grande
       - DISPLAY=${DISPLAY:-:0}
       - XAUTHORITY=/tmp/.Xauthority
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
-      # Cookie de autenticação do X (no Wayland/Xwayland o nome muda a cada sessão)
       - ${XAUTHORITY:-~/.Xauthority}:/tmp/.Xauthority:ro
     security_opt:
       - label=disable

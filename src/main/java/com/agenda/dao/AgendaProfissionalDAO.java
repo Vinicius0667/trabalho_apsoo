@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AgendaProfissionalDAO {
-
     public List<AgendaProfissional> listarPorProfissional(long idProfissional) throws SQLException {
         List<AgendaProfissional> lista = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance().getConnection();

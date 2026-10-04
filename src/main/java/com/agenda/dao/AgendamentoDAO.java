@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AgendamentoDAO {
-
     private static final String SQL_SELECT =
             "SELECT a.*, c.nome AS nome_cliente, u.nome AS nome_profissional " +
             "FROM agendamento a " +
@@ -25,13 +24,7 @@ public class AgendamentoDAO {
             "JOIN usuario u ON u.id = a.id_profissional ";
 
     private final ItemAgendamentoDAO itemDAO = new ItemAgendamentoDAO();
-    private final ClienteDAO clienteDAO = new ClienteDAO();
 
-    /**
-     * Insere o agendamento e seus itens numa única transação
-     * (composição: agendamento não existe sem pelo menos um item).
-     * Se o cliente ainda não existe (id = 0), ele é criado na mesma transação.
-     */
     public void inserir(Agendamento agendamento) throws SQLException {
         String sql = "INSERT INTO agendamento " +
                      "(id_cliente, id_profissional, data_agendada, horario_inicio, horario_fim, status, observacoes) " +
@@ -40,10 +33,6 @@ public class AgendamentoDAO {
         Connection conn = DatabaseConnection.getInstance().getConnection();
         try {
             conn.setAutoCommit(false);
-
-            if (agendamento.getCliente().getId() == 0) {
-                clienteDAO.inserir(conn, agendamento.getCliente());
-            }
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setLong(1, agendamento.getCliente().getId());
@@ -74,7 +63,6 @@ public class AgendamentoDAO {
         }
     }
 
-    /** Verifica se o profissional já tem um agendamento ativo que se sobrepõe ao horário. */
     public boolean existeConflito(long idProfissional, LocalDate data, LocalTime inicio, LocalTime fim) throws SQLException {
         String sql = "SELECT 1 FROM agendamento " +
                      "WHERE id_profissional = ? AND data_agendada = ? AND status NOT IN (?, ?) " +
