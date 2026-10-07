@@ -36,5 +36,6 @@ services:
       - ${XAUTHORITY:-~/.Xauthority}:/tmp/.Xauthority:ro
     security_opt:
       - label=disable
-    userns: keep-id
+    userns_mode: "keep-id"
+    user: "${UID}:${GID}" 
     restart: unless-stopped
