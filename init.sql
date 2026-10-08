@@ -111,12 +111,12 @@ CREATE TABLE IF NOT EXISTS public.repasse_comissao (
     CONSTRAINT repasse_comissao_agendamento_fkey FOREIGN KEY (id_agendamento) REFERENCES public.agendamento(id) ON DELETE CASCADE
 );
 
-INSERT INTO public.usuario (id, nome, cpf, telefone, email, senha) VALUES
-    (1, 'Admin', '000.000.000-00', '67999990000', 'admin@agenda.com', '21232f297a57a5a743894a0e4a801fc3'),
-    (2, 'Maria Souza', '111.111.111-11', '67999991111', 'maria@agenda.com', '202cb962ac59075b964b07152d234b70'),
-    (3, 'Joao Lima', '222.222.222-22', '67999992222', 'joao@agenda.com', '202cb962ac59075b964b07152d234b70'),
-    (4, 'Fernanda Alves', '333.333.333-33', '67999993333', 'fernanda@agenda.com', '202cb962ac59075b964b07152d234b70'),
-    (5, 'Pedro Santos', '444.444.444-44', '67999994444', 'pedro@agenda.com', '202cb962ac59075b964b07152d234b70')
+INSERT INTO public.usuario (id, nome, cpf, telefone, email, senha, tipo) VALUES
+    (1, 'Admin', '000.000.000-00', '67999990000', 'admin@agenda.com', '21232f297a57a5a743894a0e4a801fc3', 1),
+    (2, 'Maria Souza', '111.111.111-11', '67999991111', 'maria@agenda.com', '202cb962ac59075b964b07152d234b70', 2),
+    (3, 'Joao Lima', '222.222.222-22', '67999992222', 'joao@agenda.com', '202cb962ac59075b964b07152d234b70', 2),
+    (4, 'Fernanda Alves', '333.333.333-33', '67999993333', 'fernanda@agenda.com', '202cb962ac59075b964b07152d234b70', 2),
+    (5, 'Pedro Santos', '444.444.444-44', '67999994444', 'pedro@agenda.com', '202cb962ac59075b964b07152d234b70', 2)
 ON CONFLICT DO NOTHING;
 SELECT setval('usuario_id_seq', (SELECT MAX(id) FROM public.usuario));
 
