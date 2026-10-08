@@ -1,7 +1,7 @@
 package com.agenda;
 
 import com.agenda.util.DatabaseConnection;
-import com.agenda.view.AgendamentosView;
+import com.agenda.view.LoginView;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -16,6 +16,6 @@ public class App {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> DatabaseConnection.getInstance().fecharConexao()));
 
-        SwingUtilities.invokeLater(() -> new AgendamentosView().setVisible(true));
+        SwingUtilities.invokeLater(() -> new LoginView().setVisible(true));
     }
 }

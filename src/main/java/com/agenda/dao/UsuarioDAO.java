@@ -52,6 +52,25 @@ public class UsuarioDAO {
         return profissional;
     }
 
+    public Profissional autenticarProfissional(String nome, String senhaMD5) throws SQLException {
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        Profissional profissional = null;
+
+        try (PreparedStatement stmt = conn.prepareStatement(SQL_PROFISSIONAL + "WHERE u.nome = ? AND u.senha = ? AND p.ativo = true")) {
+            stmt.setString(1, nome);
+            stmt.setString(2, senhaMD5);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    profissional = montarProfissional(rs);
+                }
+            }
+        }
+        if (profissional != null) {
+            profissional.setEspecialidades(listarEspecialidades(profissional.getIdProfissional()));
+        }
+        return profissional;
+    }
+
     public Administrador buscarAdministradorPorId(long id) throws SQLException {
         String sql = "SELECT u.* FROM administrador a JOIN usuario u ON u.id = a.id WHERE a.id = ?";
         Connection conn = DatabaseConnection.getInstance().getConnection();
