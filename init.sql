@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.usuario (
     telefone varchar(15) NOT NULL,
     email varchar(60) NOT NULL,
     senha varchar(255) NOT NULL,
+    tipo int4 DEFAULT 2 NOT NULL,
     CONSTRAINT usuario_pkey PRIMARY KEY (id),
     CONSTRAINT usuario_email_key UNIQUE (email)
 );
@@ -111,11 +112,11 @@ CREATE TABLE IF NOT EXISTS public.repasse_comissao (
 );
 
 INSERT INTO public.usuario (id, nome, cpf, telefone, email, senha) VALUES
-    (1, 'Admin', '000.000.000-00', '67999990000', 'admin@agenda.com', 'admin'),
-    (2, 'Maria Souza', '111.111.111-11', '67999991111', 'maria@agenda.com', '123'),
-    (3, 'Joao Lima', '222.222.222-22', '67999992222', 'joao@agenda.com', '123'),
-    (4, 'Fernanda Alves', '333.333.333-33', '67999993333', 'fernanda@agenda.com', '123'),
-    (5, 'Pedro Santos', '444.444.444-44', '67999994444', 'pedro@agenda.com', '123')
+    (1, 'Admin', '000.000.000-00', '67999990000', 'admin@agenda.com', '21232f297a57a5a743894a0e4a801fc3'),
+    (2, 'Maria Souza', '111.111.111-11', '67999991111', 'maria@agenda.com', '202cb962ac59075b964b07152d234b70'),
+    (3, 'Joao Lima', '222.222.222-22', '67999992222', 'joao@agenda.com', '202cb962ac59075b964b07152d234b70'),
+    (4, 'Fernanda Alves', '333.333.333-33', '67999993333', 'fernanda@agenda.com', '202cb962ac59075b964b07152d234b70'),
+    (5, 'Pedro Santos', '444.444.444-44', '67999994444', 'pedro@agenda.com', '202cb962ac59075b964b07152d234b70')
 ON CONFLICT DO NOTHING;
 SELECT setval('usuario_id_seq', (SELECT MAX(id) FROM public.usuario));
 
