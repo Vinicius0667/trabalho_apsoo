@@ -3,6 +3,7 @@ package com.agenda.dao;
 import com.agenda.model.Administrador;
 import com.agenda.model.Especialidade;
 import com.agenda.model.Profissional;
+import com.agenda.model.Usuario;
 import com.agenda.util.DatabaseConnection;
 
 import java.sql.Connection;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class UsuarioDAO {
     private static final String SQL_PROFISSIONAL =
-            "SELECT u.id, u.nome, u.cpf, u.telefone, u.email, " +
+            "SELECT u.id, u.nome, u.cpf, u.telefone, u.email, u.tipo, " +
             "       p.percentual_comissao, p.status_profissional, p.ativo " +
             "FROM profissional p JOIN usuario u ON u.id = p.id_profissional ";
 
@@ -52,23 +53,28 @@ public class UsuarioDAO {
         return profissional;
     }
 
-    public Profissional autenticarProfissional(String nome, String senhaMD5) throws SQLException {
+    public Usuario autenticarUsuario(String nome, String senhaMD5) throws SQLException {
         Connection conn = DatabaseConnection.getInstance().getConnection();
-        Profissional profissional = null;
-
-        try (PreparedStatement stmt = conn.prepareStatement(SQL_PROFISSIONAL + "WHERE u.nome = ? AND u.senha = ? AND p.ativo = true")) {
+        String sql = "SELECT id, tipo FROM usuario WHERE nome = ? AND senha = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nome);
             stmt.setString(2, senhaMD5);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    profissional = montarProfissional(rs);
+                    int tipo = rs.getInt("tipo");
+                    long id = rs.getLong("id");
+                    if (tipo == 1) {
+                        return buscarAdministradorPorId(id);
+                    } else {
+                        Profissional p = buscarProfissionalPorId(id);
+                        if (p != null && p.isAtivo()) {
+                            return p;
+                        }
+                    }
                 }
             }
         }
-        if (profissional != null) {
-            profissional.setEspecialidades(listarEspecialidades(profissional.getIdProfissional()));
-        }
-        return profissional;
+        return null;
     }
 
     public Administrador buscarAdministradorPorId(long id) throws SQLException {
@@ -87,6 +93,7 @@ public class UsuarioDAO {
                 a.setCpf(rs.getString("cpf"));
                 a.setTelefone(rs.getString("telefone"));
                 a.setEmail(rs.getString("email"));
+                a.setTipo(rs.getInt("tipo"));
                 return a;
             }
         }
@@ -125,6 +132,7 @@ public class UsuarioDAO {
         p.setPercentualComissao(rs.getDouble("percentual_comissao"));
         p.setStatusProfissional(rs.getString("status_profissional"));
         p.setAtivo(rs.getBoolean("ativo"));
+        p.setTipo(rs.getInt("tipo"));
         return p;
     }
 }

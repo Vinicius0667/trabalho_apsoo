@@ -3,6 +3,7 @@ package com.agenda.view;
 import com.agenda.controller.AgendamentoControladora;
 import com.agenda.model.Agendamento;
 import com.agenda.model.ItemAgendamento;
+import com.agenda.model.Profissional;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,11 +18,17 @@ public class AgendamentosView extends JFrame {
     private DefaultTableModel modeloTabela;
 
     private final AgendamentoControladora controller;
+    private final com.agenda.model.Usuario usuarioLogado;
 
-    public AgendamentosView() {
+    public AgendamentosView(com.agenda.model.Usuario usuarioLogado) {
+        this.usuarioLogado = usuarioLogado;
         controller = new AgendamentoControladora();
         inicializarComponentes();
         atualizarTabela();
+    }
+
+    public com.agenda.model.Usuario getUsuarioLogado() {
+        return usuarioLogado;
     }
 
     private void inicializarComponentes() {
@@ -59,6 +66,8 @@ public class AgendamentosView extends JFrame {
         rodape.add(direita, BorderLayout.EAST);
         add(rodape, BorderLayout.SOUTH);
 
+        btnAdmin.setEnabled(usuarioLogado != null && usuarioLogado.getTipo() == 1);
+
         btnAdmin.addActionListener(e -> new AdminView().setVisible(true));
         btnAtualizar.addActionListener(e -> atualizarTabela());
         btnNovo.addActionListener(e -> new ProfissionalView(this).setVisible(true));
@@ -68,6 +77,11 @@ public class AgendamentosView extends JFrame {
         modeloTabela.setRowCount(0);
         try {
             for (Agendamento a : controller.listarTodosAgendamentos()) {
+                if (usuarioLogado != null && usuarioLogado.getTipo() != 1) {
+                    if (a.getProfissional().getId() != usuarioLogado.getId()) {
+                        continue;
+                    }
+                }
                 modeloTabela.addRow(new Object[]{
                         a.getId(),
                         a.getCliente().getNome(),

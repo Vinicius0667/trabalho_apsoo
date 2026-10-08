@@ -171,12 +171,27 @@ public class ProfissionalView extends JFrame {
             for (Servico s : controller.listarServicos()) {
                 cbServico.addItem(s);
             }
+            
+            com.agenda.model.Usuario logado = agendamentosView.getUsuarioLogado();
+            Profissional selecionadoParaLogado = null;
+            
             for (Profissional p : controller.listarProfissionais()) {
                 cbProfissional.addItem(p);
+                if (logado != null && p.getId() == logado.getId()) {
+                    selecionadoParaLogado = p;
+                }
             }
+            
             cbCliente.setSelectedIndex(-1);
             cbServico.setSelectedIndex(-1);
-            cbProfissional.setSelectedIndex(-1);
+            
+            if (logado != null && logado.getTipo() != 1) {
+                cbProfissional.setSelectedItem(selecionadoParaLogado);
+                cbProfissional.setEnabled(false);
+            } else {
+                cbProfissional.setSelectedIndex(-1);
+                cbProfissional.setEnabled(true);
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }

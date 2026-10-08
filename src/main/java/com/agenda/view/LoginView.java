@@ -2,6 +2,7 @@ package com.agenda.view;
 
 import com.agenda.dao.UsuarioDAO;
 import com.agenda.model.Profissional;
+import com.agenda.model.Usuario;
 import com.agenda.util.MD5Util;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ public class LoginView extends JFrame {
 
     private JTextField txtTextoHash;
     private JTextField txtResultadoHash;
-    private JButton btnGerarHash;
+    // private JButton btnGerarHash;
 
     private UsuarioDAO usuarioDAO;
 
@@ -126,14 +127,13 @@ public class LoginView extends JFrame {
         String senhaMD5 = MD5Util.getMD5Hash(senha);
 
         try {
-            Profissional profissional = usuarioDAO.autenticarProfissional(nome, senhaMD5);
-            if (profissional != null) {
-                JOptionPane.showMessageDialog(this, "Login efetuado com sucesso!\nBem-vindo(a), " + profissional.getNome(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            Usuario usuario = usuarioDAO.autenticarUsuario(nome, senhaMD5);
+            if (usuario != null) {
+                JOptionPane.showMessageDialog(this, "Login efetuado com sucesso!\nBem-vindo(a), " + usuario.getNome(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
-                // Apenas abrindo AgendamentosView conforme solicitado
-                new AgendamentosView().setVisible(true);
+                new AgendamentosView(usuario).setVisible(true);
             } else {
-                JOptionPane.showMessageDialog(this, "Usuário ou senha inválidos, ou profissional inativo.", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Usuário ou senha inválidos, ou conta inativa.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         } catch (SQLException e) {
             e.printStackTrace();

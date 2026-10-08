@@ -29,13 +29,7 @@ services:
       - DB_USER=root
       - DB_PASSWORD=root
       - TZ=America/Campo_Grande
-      - DISPLAY=${DISPLAY:-:0}
-      - XAUTHORITY=/tmp/.Xauthority
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:ro
-      - ${XAUTHORITY:-~/.Xauthority}:/tmp/.Xauthority:ro
+      - DISPLAY=host.docker.internal:0.0
     security_opt:
-      - label=disable
-    userns_mode: "keep-id"
-    user: "${UID}:${GID}" 
+      - label=disable    
     restart: unless-stopped
